@@ -13,6 +13,7 @@ type config struct {
 	mu 					*sync.Mutex
 	concurrencyChannel 	chan struct{}
 	ws 					*sync.WaitGroup
+	maxPages			int
 }
 
 func (cfg *config) addPageVisit(normalizedURL string) (isFirst bool) {
@@ -28,7 +29,7 @@ func (cfg *config) addPageVisit(normalizedURL string) (isFirst bool) {
 	return true
 }
 
-func configure(rawBaseURL string, maxConcurrency int) (*config, error) {
+func configure(rawBaseURL string, maxConcurrency, maxPages int) (*config, error) {
 	baseURL, err := url.Parse(rawBaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("Error - configure: couldn't parse URL: %v", err)
@@ -40,5 +41,6 @@ func configure(rawBaseURL string, maxConcurrency int) (*config, error) {
 		mu: &sync.Mutex{},
 		concurrencyChannel: make(chan struct{}, maxConcurrency),
 		ws: &sync.WaitGroup{},
+		maxPages: maxPages,
 	}, nil
 }

@@ -6,12 +6,13 @@ import (
 )
 
 func (cfg *config) crawlPage(rawCurrentURL string) {
+
 	cfg.concurrencyChannel <- struct{}{}
 	defer func() {
 		<-cfg.concurrencyChannel
 		cfg.ws.Done()
 	}()
-
+	
 	currentURL, err := url.Parse(rawCurrentURL)
 	if err != nil {
 		fmt.Printf("Error - crawlPage: couldn't parse URL %s : %v\n", rawCurrentURL, err)
@@ -35,6 +36,13 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 		return
 	}
 
+	cfg.mu.Lock()
+	if len(cfg.pages) >= cfg.maxPages {
+		cfg.mu.Unlock()
+		return
+	}
+	cfg.mu.Unlock()
+	
 	htmlBody, err := getHTML(rawCurrentURL)
 	if err != nil {
 		fmt.Printf("Error - crawlPage: couldn't retrieve HTML: %v", err)
