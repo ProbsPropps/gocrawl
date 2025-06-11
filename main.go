@@ -45,8 +45,6 @@ func main() {
 	cfg.crawlPage(rawBaseURL)
 	cfg.ws.Wait()
 
-	for normalizedURL, count := range cfg.pages {
-		fmt.Printf("%d -%s\n", count, normalizedURL)
-	}
+	printReport(cfg.pages, rawBaseURL)
 
 }
