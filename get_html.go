@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"io"
+	"net/http"
+	"strings"
 )
 
 func getHTML(rawURL string) (string, error) {
 	resp, err := http.Get(rawURL)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("got network error: %v", err)
 	}
 	defer resp.Body.Close()
 
@@ -20,7 +21,7 @@ func getHTML(rawURL string) (string, error) {
 	
 	contentType := resp.Header.Get("content-type")
 
-	if contentType != "text/html" {
+	if !strings.Contains(contentType, "text/html") {
 		return "", fmt.Errorf("Content type mismatch: %s", contentType)
 	}
 	

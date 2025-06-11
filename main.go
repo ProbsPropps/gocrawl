@@ -10,16 +10,29 @@ func main() {
 
 	if len(urlArgs) < 1 {
 		fmt.Println("no website provided")
-		os.Exit(1)
+		return
 	} 
 	
 	if len(urlArgs) > 1 {
 		fmt.Println("too many arguments provided")
-		os.Exit(1)
-	}
+		return
+	}	
 	
-	url := urlArgs[0]
+	rawBaseURL := urlArgs[0]
+	cfg, err := configure(rawBaseURL, 1)
+	if err != nil {
+		msg := fmt.Errorf("Error when creating config struct, %v", err)
+		fmt.Println(msg)
+		return
+	}
+	fmt.Printf("starting crawl of: %v\n", rawBaseURL)
+	
+	cfg.ws.Add(1)
+	cfg.crawlPage(rawBaseURL)
+	cfg.ws.Wait()
 
-	fmt.Printf("starting crawl of: %v\n", url)
-	fmt.Print(getHTML(url))
+	for normalizedURL, count := range cfg.pages {
+		fmt.Printf("%d -%s\n", count, normalizedURL)
+	}
+
 }

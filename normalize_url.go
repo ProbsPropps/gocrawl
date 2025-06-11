@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/url"
+	"strings"
 )
 
 func normalizeURL(inputURL string) (string, error) {
@@ -9,10 +10,12 @@ func normalizeURL(inputURL string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if urlData.Path == "/" || urlData.Path == "" {
-		return urlData.Host, nil
-	}
 
 	fullURL := urlData.Host + urlData.Path
+	
+	fullURL = strings.ToLower(fullURL)
+
+	fullURL = strings.TrimSuffix(fullURL, "/")
+
 	return fullURL, nil
 }
